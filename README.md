@@ -7,7 +7,10 @@ Group-12 team project "Personal_assistant"
 3.Інструкція користання мапою
 4.Інструкція користання сортуванням
 5.Гра
-
+<p align="center">
+  <img src="[https://drive.google.com/file/d/1fPLmH97o65MQSOvWyanhIGszXeASu4P7/view?usp=drive_link]"
+  alt="PythonGram" width="256" height="256">
+</p>
 1.Інструкція встановлення:
 Відкрити командну строку та перейти в дерикторію з застосунком, вписати комманди:
 pip install -r requirements (встановлює всі нетсандартні бібліоткеи що були використані в коді)
