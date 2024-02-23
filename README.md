@@ -8,7 +8,7 @@ Group-12 team project "Personal_assistant"
 4.Інструкція користання сортуванням
 5.Гра
 <p align="center">
-  <img src="https://drive.google.com/file/d/1fPLmH97o65MQSOvWyanhIGszXeASu4P7/view?usp=drive_link"
+  <img src="(https://drive.google.com/file/d/1fPLmH97o65MQSOvWyanhIGszXeASu4P7/view?usp=drive_link)"
   alt="Personal_assistant" width="256" height="256">
 </p>
 1.Інструкція встановлення:
