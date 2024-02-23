@@ -8,7 +8,7 @@ Group-12 team project "Personal_assistant"
 4.Інструкція користання сортуванням
 5.Гра
 <p align="center">
- <img width="200px" src="screenshot/menu.PNG" alt="qr"/>
+ <img width="500px" src="screenshot/menu.PNG" alt="qr"/>
 </p>
 1.Інструкція встановлення:
 Відкрити командну строку та перейти в дерикторію з застосунком, вписати комманди:
