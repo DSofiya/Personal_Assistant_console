@@ -1,12 +1,15 @@
+import tkinter as tk
+from tkinter import messagebox
 from collections import UserDict
 from datetime import datetime, timedelta
 import os
+import sys
+from dateutil.parser import parse
 import dill as pickle
 import re
-from dateparser import parse
-from prompt_toolkit import prompt
-from .prompt_tool import Completer, RainbowLetter
 
+
+from prompt_toolkit import prompt
 
 class Field:
     def __init__(self, some_value):
@@ -43,9 +46,8 @@ class Phone(Field):
 class Birthday(Field):
     def valid_date(self, value: str):
         try:
-            # obj_datetime = parse(value)
-            obj_datetime = datetime.strptime(value, '%Y-%m-%d')
-            return obj_datetime.date()
+            obj_datetime = parse(value).date()
+            return obj_datetime
         except KeyError:
             raise TypeError('Wrong data type. Try "yyyy-mm-dd"')
 
@@ -97,30 +99,41 @@ class Record:
     def days_to_birthday(self):
         pass
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
     def update_record(self, record: Record):
-        self.data[record.name.value] = record
+         self.data[record.name.value] = record
 
-    def delete_record(self, name):
-        self.data.pop(name)
+    def delete_record(self, record: Record):
+        self.data.pop(record)
 
     def find_record(self, name):
         return self.data.get(name)
 
     def __init__(self):
+        self.file_path = 'AdressBook.bin'
         super().__init__()
 
     def dump(self):
-        with open('AdressBook.bin', 'wb') as file:
+        with open(self.file_path, 'wb') as file:
             pickle.dump(self.data, file)
 
     def load(self):
-        with open('AdressBook.bin', 'rb') as file:
-            self.data = pickle.load(file)
+        if os.path.exists(self.file_path) and os.path.getsize(self.file_path) > 0:
+            with open(self.file_path, 'rb') as file:
+                self.data = pickle.load(file)
+
         
 contact_list = AddressBook()
 
@@ -142,62 +155,119 @@ def input_error(func):
     return wrapper
 
 
-# @input_error
-def command_add():
-    name = Name(input("Введіть ім'я: ").title())
-    phone = Phone(input('Введіть номер: '))
-    birthday = Birthday(input('Введіть дату народження: '))
-    email = Email(input('Введіть email-пошту: '))
-    adress = Adress(input('Введіть адрессу: '))
-    contacts = Record(name, phone, birthday, email, adress)
-    contact_list.add_record(contacts)
-    return f"Contact {name} has been added."
+def add_contact():
+    def save_contact():
+        name = name_entry.get()
+        phone = phone_entry.get()
+        birthday = birthday_entry.get()
+        email = email_entry.get()
+        address = address_entry.get()
+
+        new_contact = Record(Name(name), Phone(phone), Birthday(birthday), Email(email), Adress(address))
+        contact_list.add_record(new_contact)
+        add_window.destroy()
+        messagebox.showinfo("Success", f"Contact {name} has been added.")
+
+    add_window = tk.Toplevel()
+    add_window.geometry("400x500")
+    add_window.title("Add Contact")
+
+    tk.Label(add_window, text="Name:").pack(pady=5)
+    name_entry = tk.Entry(add_window)
+    name_entry.pack()
+
+    tk.Label(add_window, text="Phone:").pack(pady=5)
+    phone_entry = tk.Entry(add_window)
+    phone_entry.pack()
+
+    tk.Label(add_window, text="Birthday:").pack(pady=5)
+    birthday_entry = tk.Entry(add_window)
+    birthday_entry.pack()
+
+    tk.Label(add_window, text="Email:").pack(pady=5)
+    email_entry = tk.Entry(add_window)
+    email_entry.pack()
+
+    tk.Label(add_window, text="Address:").pack(pady=5)
+    address_entry = tk.Entry(add_window)
+    address_entry.pack()
+
+    tk.Button(add_window, text="OK", command=save_contact).pack()
 
 
 @input_error
 def command_delete(input_str):
-    _, name = input_str.split()
-    contact_list.delete_record(name.title())
-    return f'Contact {name.title()} succefully deleted'
+    result = contact_list.find_record(input_str)
+    if result:
+        contact_list.delete_record(result)
+        show_custom_message("Delete ", f'Contact {input_str} succefully deleted', 800, 300)
+  
 
-
-@input_error
 def command_change():
-    name = Name(input("Введіть ім'я: ").title())
-    phone = Phone(input('Введіть номер: '))
-    birthday = Birthday(input('Введіть дату народження: '))
-    email = Email(input('Введіть email-пошту: '))
-    adress = Adress(input('Введіть адрессу: '))
-    update = Record(name, phone, birthday, email, adress)
-    contact_list.update_record(update)
-    return f"Contact {name} has been updated."
+    def update_record():
+        name = name_entry.get()
+        phone = phone_entry.get()
+        birthday = birthday_entry.get()
+        email = email_entry.get()
+        address = address_entry.get()
+        update = Record(Name(name), Phone(phone), Birthday(birthday), Adress(email), Adress(address))
+        contact_list.update_record(update)
+        add_window.destroy()
+        messagebox.showinfo("Success", f"Contact {name} has been changed.")
+
+    add_window = tk.Toplevel()
+    add_window.geometry("400x500")
+    add_window.title("Change Contact")
+
+    tk.Label(add_window, text="Change the name:").pack(pady=5)
+    name_entry = tk.Entry(add_window)
+    name_entry.pack()
+
+    tk.Label(add_window, text="Change the number:").pack(pady=5)
+    phone_entry = tk.Entry(add_window)
+    phone_entry.pack()
+
+    tk.Label(add_window, text="Change birthday:").pack(pady=5)
+    birthday_entry = tk.Entry(add_window)
+    birthday_entry.pack()
+
+    tk.Label(add_window, text="Change email:").pack(pady=5)
+    email_entry = tk.Entry(add_window)
+    email_entry.pack()
+
+    tk.Label(add_window, text="Change adress:").pack(pady=5)
+    address_entry = tk.Entry(add_window)
+    address_entry.pack()
+
+    tk.Button(add_window, text="OK", command=update_record).pack()
 
 
 @input_error
 def command_search(input_str):
-    _, name = input_str.split()
-    result = contact_list.find_record(name.title())
-    return result.name.value, result.phone.value, str(result.birthday.value), result.email.value, result.adress.value
+    result = contact_list.find_record(input_str)
+    if result:
+        result = '{:<14}|{:^16}|{:^18}|{:^30}|{:^30} |\n'.format(result.name.value, result.phone.value, str(result.birthday.value), result.email.value, result.adress.value)   
+        show_custom_message("Show ", result, 800, 300)
 
 
-def command_show_all(contact_list):
+
+def show_all():
+    result = ""
     if not contact_list:
-        return "Список контактів пустий."
-    result = "Contacts:"
-    print(result)
-    print('------------------------------------------------------------------------------------------------------------------')
-    print('Name          |     Number     |     Birthday     |            Email             |             Adress            |')
-    for name, value in contact_list.items():
-        print('--------------|----------------|------------------|------------------------------|-------------------------------|')
-        print('{:<14}|{:^16}|{:^18}|{:^30}|{:^30} |'.format(name, value.phone.value, str(
-            value.birthday.value), value.email.value, value.adress.value))
-    print('------------------------------------------------------------------------------------------------------------------')
+        result = "List of contacts is empty"
+    else:
+        result += "Contacts:\n"
+        result += 'Name          |     Number     |     Birthday     |            Email             |             Adress            |\n'
+        for name, value in contact_list.items():
+            result += '--------------|----------------|------------------|------------------------------|-------------------------------|\n'
+            result += '{:<14}|{:^16}|{:^18}|{:^30}|{:^30} |\n'.format(name, value.phone.value, str(value.birthday.value), value.email.value, value.adress.value)
+
+    show_custom_message("Show All", result, 800, 300)
 
 
 @input_error
-def command_days_to_birthday(input_str):
-    result = ''
-    _, days = input_str.split()
+def days_to_birthday(days):
+    result = ""
     d_now = datetime.now().date()
     for key, value in contact_list.items():
         birthday = value.birthday.value
@@ -206,38 +276,62 @@ def command_days_to_birthday(input_str):
         days_to_br = d_now + days_to_br
         if d_now <= birthday <= days_to_br:
             result += f'{key} have birthday in next {days} days. {value.birthday}\n'
-        else:
-            continue
-    return result.strip() if result else f'No birthdays in next {days} days'
+    if not result:
+        result = f'No birthdays in next {days} days'
+    
+    show_custom_message("days to birthday", result, 300, 200)
+
+
+def show_custom_message(title, message, width, height):
+    root = tk.Tk()
+    root.withdraw() 
+    custom_message = tk.Toplevel(root)
+    custom_message.title(title)
+    custom_message.geometry(f"{width}x{height}")
+    label = tk.Label(custom_message, text=message)
+    label.pack()
+    ok_button = tk.Button(custom_message, text="OK", command=custom_message.destroy)
+    ok_button.pack()
+    custom_message.mainloop()
+ 
 
 def main():
     if os.path.exists('AdressBook.bin'):
         contact_list.load()
-    print("Доступні команди:'hello','add','change', 'delete', 'search', 'birthday', 'show all','good bye','close','exit'")
-    while True:
-        input_str = prompt("Enter your command: ",completer=Completer, lexer=RainbowLetter())
 
-        if input_str == "hello":
-            print("How can I help you?")
-        elif input_str.startswith("add"):
-            print(command_add())
-        elif input_str.startswith("change"):
-            print(command_change())
-        elif input_str.startswith("delete "):
-            print(command_delete(input_str))
-        elif input_str.startswith("search "):
-            print(command_search(input_str))
-        elif input_str.startswith("birthday "):
-            print(command_days_to_birthday(input_str))
-        elif input_str == "show all":
-            command_show_all(contact_list)
-        elif input_str in ["good bye", "close", "exit"]:
-            print("Good bye!")
-            break
-        else:
-            print("Невірно введена команда. Доступні команди:'hello','add','change','phone','show all','good bye','close','exit'")
-        contact_list.dump()
+    root = tk.Tk()
+    root.title("How can I help you?")
+    
+    def command_search_wrapper():
+        input_str = entry.get() 
+        command_search(input_str)
 
+    def command_delete_wrapper():
+        input_str = entry.get() 
+        command_delete(input_str)
+
+    def days_to_birthday_wrapper():
+        input_str = entry.get() 
+        days_to_birthday(input_str)
+
+    root.geometry("400x500")
+
+    button_width = 20  
+    button_height = 2
+    
+    tk.Label(root, text="Enter: ").pack()
+    entry = tk.Entry(root)
+    entry.pack(pady=5)
+    
+    tk.Button(root, text="Add new contact", width=button_width, height=button_height, command=add_contact).pack(pady=5)
+    tk.Button(root, text="Change contact", width=button_width, height=button_height, command=command_change).pack(pady=5)
+    tk.Button(root, text="Delete contact", width=button_width, height=button_height, command=command_delete_wrapper).pack(pady=5)
+    tk.Button(root, text="Search contact", width=button_width, height=button_height, command=command_search_wrapper).pack(pady=5)
+    tk.Button(root, text="Show All", width=button_width, height=button_height, command=show_all).pack(pady=5)
+    tk.Button(root, text="Days to Birthday", width=button_width, height=button_height, command=days_to_birthday_wrapper).pack(pady=5)
+    tk.Button(root, text="Exit", width=button_width, height=button_height, command=root.destroy).pack(pady=5)
+
+    root.mainloop()
 
 if __name__ == "__main__":
     main()

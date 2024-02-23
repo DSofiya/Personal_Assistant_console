@@ -1,5 +1,7 @@
 import os
 import shutil
+import tkinter as tk
+from tkinter import messagebox
 
 class FileSorter:
     def __init__(self, path):
@@ -26,7 +28,7 @@ class FileSorter:
 
     def normalize(self, name):
         return ''.join(c for c in name if c.isalnum() or c in [' ', '.', '_']).rstrip()
-    #нормалізує ім;я
+
 
     def add_and_print_extensions(self, folder, extension):
         if folder in self.for_print:
@@ -34,7 +36,7 @@ class FileSorter:
                 self.for_print[folder].append(extension)
         else:
             self.unknown_extensions.add(extension)
-    #якщо розширення не в фор_прінт, розширення перекидається до фор_прінт
+
 
     def sort_files(self):
         for root, dirs, files in os.walk(self.path):
@@ -55,24 +57,20 @@ class FileSorter:
                         break
                 if not found:
                     self.unknown_extensions.add(extension.lower())
-    #основна частина коду, створюємо нову папку відповідно до розширення папки та перекидуєм її туди, потім викликаємо функцію адд_енд_прінт, ти визначаємо що далі робити з розширенням, або перекидаємо його до невідомих
 
         for folder in ['archives']:
             for root, dirs, files in os.walk(os.path.join(self.path, folder)):
                 for file in files:
                     filename, extension = os.path.splitext(file)
-    #розділяємо ім'я та розширення за допомгою функцій ос
 
                     if extension.lower() in self.extensions['archives']:
                         self.for_print['archives'].append(extension.lower())
-    #додаємо в знайдені розширення, знайдений архів
 
                     if extension.lower() == '.zip':
                         new_folder = os.path.join(root, self.normalize(filename))
                         os.makedirs(new_folder, exist_ok=True)
                         shutil.unpack_archive(os.path.join(root, file), new_folder)
                         os.remove(os.path.join(root, file))
-    #розпаковуємо архів за допомогою функцій шутіл та ос
 
     def print_results(self):
         print('Знайдені розширення:')
@@ -83,15 +81,33 @@ class FileSorter:
         print('Невідомі розширення:')
         print(', '.join(self.unknown_extensions))
     
+
+
+
 def main():
-    while True:    
-        print("Для відміни введіть пусту строку або 'cancel'. ")
-        path = str(input("Шлях до папки ==> (C:|Users|Oleg|Documents|some_rubbish): "))
+
+    def  start_sort_files():
+        input_str = entry.get() 
+        path = str(input_str)
         if path == '' or path == 'cancel':
-            break
-        sorter = FileSorter(path)
-        sorter.sort_files()
-        sorter.print_results()
+            messagebox.showinfo("Success", "You have unsorted")
+            add_window.destroy()
+        else:
+            sorter = FileSorter(path)
+            sorter.sort_files()
+            sorter.print_results()
+            messagebox.showinfo("Success", "You have sorted all file")
+            add_window.destroy()
+
+    add_window = tk.Toplevel()
+    add_window.geometry("400x500")
+    add_window.title("Для відміни введіть пусту строку або cancel")
+    tk.Label(add_window, text="Шлях до папки ==> (C:|Users|Oleg|Documents|some_rubbish): ").pack()
+    entry = tk.Entry(add_window)
+    entry.pack()
+    tk.Button(add_window, text="OK", command=start_sort_files).pack()
+    
+    
 
 if __name__ == "__main__":
     main()

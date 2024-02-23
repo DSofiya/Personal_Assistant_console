@@ -1,37 +1,43 @@
-from .AdressBook.AB import main as ab_main
-from .NoteBook.NB import main as nb_main
-from .Map.Map import main as map_main
-from .sort.sort import main as sort_main
-from .Game.game import main as game_main
 import os
+import tkinter as tk
+from AdressBook.AB import main as ab_main
+from Map.Map import main as map_main
+from sort.sort import main as sort_main
+from Game.game import main as game_main
 
 def cls():
-    os.system(['clear','cls'][os.name == 'nt'])
+    os.system(['clear', 'cls'][os.name == 'nt'])
 
 def menu():
     cls()
-    while True:
-        cls()
-        print('MENU')
-        choice = input(
-            'Вітаю, я ваш персональний помічник.\nОберіть функцію:\n1.Записна книжка\n2.Нотатник\n3.Карта\n4.Сортування папки\n5.Гра\n0.Вихід\n>>>')
-        if choice == '1':
-            cls()
-            ab_main()
-        elif choice == '2':
-            cls()
-            nb_main()
-        elif choice == '3':
-            cls()
-            map_main()
-        elif choice == '4':
-            cls()
-            sort_main()
-        elif choice == '5':
-            cls()
-            game_main()
-        elif choice == '0':
-            break
+
+    root = tk.Tk()
+    root.title("Personal Assistant")
+    root.geometry("400x500")
+    
+    def open_ab():
+        ab_main()
+
+    def open_map():
+        map_main()
+
+    def open_sort():
+        sort_main()
+
+    def open_game():
+        game_main()
+
+    button_width = 20
+    button_height = 2
+
+    
+    tk.Button(root, text="Записна книжка", width=button_width, height=button_height, command=open_ab).pack(pady=5)
+    tk.Button(root, text="Карта", width=button_width, height=button_height, command=open_map).pack(pady=5)
+    tk.Button(root, text="Сортування папки", width=button_width, height=button_height, command=open_sort).pack(pady=5)
+    tk.Button(root, text="Гра", width=button_width, height=button_height, command=open_game).pack(pady=5)
+    tk.Button(root, text="Вихід", width=button_width, height=button_height, command=root.destroy).pack(pady=5)
+
+    root.mainloop()
 
 if __name__ == '__main__':
     menu()
