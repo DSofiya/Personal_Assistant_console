@@ -1,8 +1,10 @@
 import folium
+import tkinter as tk
+from tkinter import messagebox
 import requests
 import re
-from prompt_toolkit import prompt
-# from prompt_tool import RainbowLetter,Completer
+# from prompt_toolkit import prompt
+
 
 def command_save(file_name, map_name):
     russia_map = folium.Map(location=[55.7558, 37.6176], zoom_start=5)
@@ -24,7 +26,8 @@ def command_save(file_name, map_name):
             ).add_to(russia_map)
 
     russia_map.save(map_name)
-    return map_name
+    show_custom_message("Збереження координат", f"Мапа з  прапорцями збережена у файлі {map_name}.", 400, 200)
+
     
 
 def input_error(func):
@@ -52,9 +55,10 @@ def get_coordinates(city_name):
         coordinates = lat, lng
     
     if coordinates:
-        return f"Координати міста {city_name}: \n Широта: {lat} \n Довгота: {lng}"  
+        show_custom_message("Пошук координат", f"Координати міста {city_name}: \n Широта: {lat} \n Довгота: {lng}", 400, 200)
     else:
-        return f"Не вдалося знайти координати для міста {city_name}."
+        show_custom_message("Пошук координат", f"Не вдалося знайти координати для міста {city_name}.", 400, 200)
+
 
 
 def check_coordinates(file_name, coordinates):
@@ -72,65 +76,83 @@ def add_coordinates(file_name, coordinates):
         if re.match(pattern, coordinates):
             with open(file_name, 'a') as file:
                 file.write('\n'+ coordinates)
-                return f"Координати {coordinates} були додані до файлу."
+                show_custom_message("Додавання координат", f"Координати {coordinates} були додані до файлу.", 400, 200)
+                
         else:
+            show_custom_message("Додавання координат", f"Координати {coordinates} мають неправильний формат.", 400, 200)
 
-            return f"Координати {coordinates} мають неправильний формат."
     else:
-        return f"Координати {coordinates} вже існують у файлі."
+        show_custom_message("Додавання координат", f"Координати {coordinates} вже існують у файлі.", 400, 200)
 
-def main(): 
-    print("Вітаю. Доступні команди:")
-    print("Зберегти карту ядерних обєктів країни 404 - 'save_nuclear'")
-    print("Додати кординати до файлу з ядерними обєктами -'add_nuclear'")
-    print("Зберегти карту аеропортів країни 404 - 'save_air'")
-    print("Додати кординати до файлу з аеропортами -'add_air'")
-    print("Зберегти карту адміністративних обєктів країни 404 - 'save_admin'")
-    print("Додати кординати до файлу з ядерними обєктами -'add_admin'")
-    print("Отримати кординати за назвою міста -'coordinates'")
-    print("Вийти - 'good bye','close','exit'") 
+
+def show_custom_message(title, message, width, height):
+    root = tk.Tk()
+    root.withdraw() 
+    custom_message = tk.Toplevel(root)
+    custom_message.title(title)
+    custom_message.geometry(f"{width}x{height}")
+    label = tk.Label(custom_message, text=message)
+    label.pack()
+    ok_button = tk.Button(custom_message, text="OK", command=custom_message.destroy)
+    ok_button.pack()
+    custom_message.mainloop()
+ 
+
+def main():
+    root = tk.Tk()
+    root.title("Мапа")
+
+    def add_coordinates_nuclear_wrapper():
+        input_str = entry.get()
+        add_coordinates('Personal_assistant\Map\coordinates_nuclear.txt',input_str)
     
-    while True:
-      
+    def add_coordinates_air_wrapper():
+        input_str = entry.get()
+        add_coordinates('Personal_assistant\Map\coordinates_air.txt',input_str)
+    
+    def add_coordinates_admin_wrapper():
+        input_str = entry.get()
+        add_coordinates('Personal_assistant\Map\coordinates_admin.txt',input_str)
 
-        input_str = prompt("Enter command: " )# , completer = Completer , lexer = RainbowLetter())
-        
-        if  input_str.startswith("save_nuclear"):
-            result =command_save('Personal_assistant\Map\coordinates_nuclear.txt','russia_map_nuclear.html')
-            print(f"Карта з  прапорцями збережена у файлі {result}.")  
-        elif input_str.startswith("save_air"):
-            result = command_save('Personal_assistant\Map\coordinates_air.txt','russia_map_air.html')
-            print(f"Карта з  прапорцями збережена у файлі {result}.") 
-        elif input_str.startswith("save_admin"):
-            result =command_save('Personal_assistant\Map\coordinates_admin.txt','russia_map_admin.html')
-            print(f"Карта з  прапорцями збережена у файлі {result}.")   
-        elif input_str == "add_nuclear":
-            input_str = input("Приклад: 55.7558,37.6176. Введіть нові кординати:")
-            print(add_coordinates('Personal_assistant\Map\coordinates_nuclear.txt', input_str))
-        elif input_str == "add_air":
-            input_str = input("Приклад: 55.7558,37.6176. Введіть нові кординати:")
-            print(add_coordinates('Personal_assistant\Map\coordinates_air.txt', input_str))
-        elif input_str == "add_admin":
-            input_str = input("Приклад: 55.7558,37.6176. Введіть нові кординати:")
-            print(add_coordinates('Personal_assistant\Map\coordinates_admin.txt', input_str))
-        elif input_str == "coordinates":
-            input_str = input("Приклад: Москва. Введіть назву міста:")
-            print(get_coordinates(input_str))         
-        elif input_str in ["good bye", "close", "exit"]:
-            print("Good bye!")
-            break
-        else:
-            print("Невірно введена команда. Доступні команди:")
-            print("Зберегти карту ядерних обєктів країни 404 - 'save_nuclear'")
-            print("Додати кординати до файлу з ядерними обєктами -'add_nuclear'")
-            print("Зберегти карту аеропортів країни 404 - 'save_air'")
-            print("Додати кординати до файлу з аеропортами -'add_air'")
-            print("Зберегти карту адміністративних обєктів країни 404 - 'save_admin'")
-            print("Додати кординати до файлу з ядерними обєктами -'add_admin'")
-            print("Отримати кординати за назвою міста -'coordinates'")
-            print("Вийти - 'good bye','close','exit'") 
+    def get_coordinates_wrapper():
+        input_str = entry1.get()
+        get_coordinates(input_str)
 
+    def command_save_nuclear_wrapper():
+        command_save('Personal_assistant\Map\coordinates_nuclear.txt','russia_map_nuclear.html')
+    
+    def command_save_air_wrapper():
+        command_save('Personal_assistant\Map\coordinates_air.txt','russia_map_air.html')
 
+    def command_save_admin_wrapper():
+        command_save('Personal_assistant\Map\coordinates_admin.txt','russia_map_admin.html')
+
+    root.geometry("600x700")
+
+    button_width = 50
+    button_height = 3
+
+    tk.Label(root, text="Поле для введення нових координат.\nПриклад: 55.7558,37.6176 ").pack()
+    entry = tk.Entry(root)
+    entry.pack(pady=5)
+
+    tk.Button(root, text="Зберегти мапу ядерних обєктів країни 404", width=button_width, height=button_height,command=command_save_nuclear_wrapper).pack(pady=5)
+    tk.Button(root, text="Додати кординати до файлу з ядерними обєктами", width=button_width, height=button_height,command= add_coordinates_nuclear_wrapper).pack(pady=5)
+    tk.Button(root, text="Зберегти мапу аеропортів країни 404", width=button_width, height=button_height,command=command_save_air_wrapper).pack(pady=5)
+    tk.Button(root, text="Додати кординати до файлу з аеропортами", width=button_width, height=button_height,command= add_coordinates_air_wrapper).pack(pady=5)
+    tk.Button(root, text="Зберегти мапу адмін обєктів країни 404", width=button_width, height=button_height,command=command_save_admin_wrapper).pack(pady=5)
+    tk.Button(root, text="Додати кординати до файлу з адмін обєктами", width=button_width, height=button_height,command= add_coordinates_admin_wrapper).pack(pady=5)
+
+    tk.Label(root, text="Поле для введення назви міст.\nПриклад: Москва").pack()
+    entry1 = tk.Entry(root)
+    entry1.pack(pady=5)
+
+    tk.Button(root, text="Отримати кординати за назвою міста", width=button_width, height=button_height,
+              command=get_coordinates_wrapper).pack(pady=5)
+    tk.Button(root, text="Вихід у головне меню", width=button_width, height=button_height,
+              command=root.destroy).pack(pady=5)
+
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
