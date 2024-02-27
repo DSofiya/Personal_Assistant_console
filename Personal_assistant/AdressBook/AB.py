@@ -172,15 +172,15 @@ def add_contact():
     add_window.geometry("400x500")
     add_window.title("Add Contact")
 
-    tk.Label(add_window, text="Name:").pack(pady=5)
+    tk.Label(add_window, text="Ім'я:").pack(pady=5)
     name_entry = tk.Entry(add_window)
     name_entry.pack()
 
-    tk.Label(add_window, text="Phone:").pack(pady=5)
+    tk.Label(add_window, text="Номер телефону:").pack(pady=5)
     phone_entry = tk.Entry(add_window)
     phone_entry.pack()
 
-    tk.Label(add_window, text="Birthday:").pack(pady=5)
+    tk.Label(add_window, text="День народження:").pack(pady=5)
     birthday_entry = tk.Entry(add_window)
     birthday_entry.pack()
 
@@ -188,7 +188,7 @@ def add_contact():
     email_entry = tk.Entry(add_window)
     email_entry.pack()
 
-    tk.Label(add_window, text="Address:").pack(pady=5)
+    tk.Label(add_window, text="Адреса:").pack(pady=5)
     address_entry = tk.Entry(add_window)
     address_entry.pack()
 
@@ -217,25 +217,25 @@ def command_change():
 
     add_window = tk.Toplevel()
     add_window.geometry("400x500")
-    add_window.title("Change Contact")
+    add_window.title("CЗмінити контакт")
 
-    tk.Label(add_window, text="Change the name:").pack(pady=5)
+    tk.Label(add_window, text="Ім'я:").pack(pady=5)
     name_entry = tk.Entry(add_window)
     name_entry.pack()
 
-    tk.Label(add_window, text="Change the number:").pack(pady=5)
+    tk.Label(add_window, text="Новий номер:").pack(pady=5)
     phone_entry = tk.Entry(add_window)
     phone_entry.pack()
 
-    tk.Label(add_window, text="Change birthday:").pack(pady=5)
+    tk.Label(add_window, text="Нова дата народження:").pack(pady=5)
     birthday_entry = tk.Entry(add_window)
     birthday_entry.pack()
 
-    tk.Label(add_window, text="Change email:").pack(pady=5)
+    tk.Label(add_window, text="Новий email:").pack(pady=5)
     email_entry = tk.Entry(add_window)
     email_entry.pack()
 
-    tk.Label(add_window, text="Change adress:").pack(pady=5)
+    tk.Label(add_window, text="Нова адреса:").pack(pady=5)
     address_entry = tk.Entry(add_window)
     address_entry.pack()
 
@@ -300,7 +300,7 @@ def main():
         contact_list.load()
 
     root = tk.Tk()
-    root.title("How can I help you?")
+    root.title("Записник контактів")
     
     def command_search_wrapper():
         input_str = entry.get() 
@@ -319,17 +319,17 @@ def main():
     button_width = 20  
     button_height = 2
     
-    tk.Label(root, text="Enter: ").pack()
+    tk.Label(root, text="Введіть ім'я для пошуку або видалення: ").pack()
     entry = tk.Entry(root)
     entry.pack(pady=5)
     
-    tk.Button(root, text="Add new contact", width=button_width, height=button_height, command=add_contact).pack(pady=5)
-    tk.Button(root, text="Change contact", width=button_width, height=button_height, command=command_change).pack(pady=5)
-    tk.Button(root, text="Delete contact", width=button_width, height=button_height, command=command_delete_wrapper).pack(pady=5)
-    tk.Button(root, text="Search contact", width=button_width, height=button_height, command=command_search_wrapper).pack(pady=5)
-    tk.Button(root, text="Show All", width=button_width, height=button_height, command=show_all).pack(pady=5)
-    tk.Button(root, text="Days to Birthday", width=button_width, height=button_height, command=days_to_birthday_wrapper).pack(pady=5)
-    tk.Button(root, text="Exit", width=button_width, height=button_height, command=root.destroy).pack(pady=5)
+    tk.Button(root, text="Додати новий запис", width=button_width, height=button_height, command=add_contact).pack(pady=5)
+    tk.Button(root, text="Змінити запис", width=button_width, height=button_height, command=command_change).pack(pady=5)
+    tk.Button(root, text="Видалити запис", width=button_width, height=button_height, command=command_delete_wrapper).pack(pady=5)
+    tk.Button(root, text="Знайти запис", width=button_width, height=button_height, command=command_search_wrapper).pack(pady=5)
+    tk.Button(root, text="Показати всі", width=button_width, height=button_height, command=show_all).pack(pady=5)
+    tk.Button(root, text="Днів до дня народження", width=button_width, height=button_height, command=days_to_birthday_wrapper).pack(pady=5)
+    tk.Button(root, text="Вихід у головне меню", width=button_width, height=button_height, command=root.destroy).pack(pady=5)
 
     root.mainloop()
 
